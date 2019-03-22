@@ -22,7 +22,7 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	}
 
 	// Log and return result
-	fmt.Println("Updated item:  ", item)
+	fmt.Println("Updated item: ", item)
 	return resp.Success()
 }
 

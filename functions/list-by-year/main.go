@@ -14,19 +14,22 @@ import (
 // Handler handles the GET by year requests.
 func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	// Make the call to the DAO with params found in the path
-	fmt.Println("Path vars: ", request.PathParameters["year"])
-	items, err := dao.ListByYear(request.PathParameters["year"])
+	year := request.PathParameters["year"]
+	fmt.Printf("Path vars: %s\n", year)
+	items, err := dao.ListByYear(year)
 	if err != nil {
+		// TODO(mdr): Do we really want to panic in this situation?
 		panic(fmt.Sprintf("Failed to find Item, %v", err))
 	}
 
 	// Make sure the Item isn't empty
 	if len(items) == 0 {
-		fmt.Println("Could not find movies with year ", request.PathParameters["year"])
+		fmt.Printf("Could not find movies with year %s\n", year)
 		return resp.InternalError(request.Body)
 	}
 
 	// Log and return result
+	// TODO(mdr): Refactor marshaling?
 	stringItems := "["
 	for i := 0; i < len(items); i++ {
 		jsonItem, _ := json.Marshal(items[i])
