@@ -12,6 +12,9 @@ import (
 
 // Handler handles the PUT requests.
 func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	// FIXME(mdr): Currently, the call to the PUT endpoint, doesn't require the
+	// ID in the URL. I don't think that falls in line with general REST
+	// principles.
 	// Log body and pass to the DAO
 	fmt.Println("Received body: ", request.Body)
 	item, err := dao.Put(request.Body)
@@ -23,7 +26,7 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 
 	// Log and return result
 	fmt.Println("Updated item: ", item)
-	return resp.Success()
+	return resp.NoContent()
 }
 
 func main() {

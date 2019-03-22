@@ -22,7 +22,7 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		// TODO(mdr): Do we really want to panic in this situation?
 		panic(fmt.Sprintf("Failed to find Item, %v", err))
 	}
-	return resp.Success()
+	return resp.NoContent()
 }
 
 func main() {
