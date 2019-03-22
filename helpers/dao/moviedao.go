@@ -68,6 +68,9 @@ func ListByYear(year string) ([]Item, error) {
 
 	// Create the Expression to fill the input struct with.
 	yearAsInt, err := strconv.Atoi(year)
+	if err != nil {
+		return items, fmt.Errorf("year wasn't convertible to int: %s", err)
+	}
 	filt := expression.Name("year").Equal(expression.Value(yearAsInt))
 
 	// Get back the title, year, and rating
