@@ -3,12 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 
 	"github.com/matthewrankin/go-sls-crudl/helpers/dao"
+	"github.com/matthewrankin/go-sls-crudl/helpers/resp"
 )
 
 // Handler handles the GET by year requests.
@@ -23,10 +23,7 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	// Make sure the Item isn't empty
 	if len(items) == 0 {
 		fmt.Println("Could not find movies with year ", request.PathParameters["year"])
-		return events.APIGatewayProxyResponse{
-			Body:       request.Body,
-			StatusCode: http.StatusInternalServerError,
-		}, nil
+		return resp.InternalError(request.Body)
 	}
 
 	// Log and return result
@@ -40,10 +37,7 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	}
 	stringItems += "]\n"
 	fmt.Println("Found items: ", stringItems)
-	return events.APIGatewayProxyResponse{
-		Body:       stringItems,
-		StatusCode: http.StatusOK,
-	}, nil
+	return resp.OK(stringItems)
 }
 
 func main() {

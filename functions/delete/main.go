@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 
 	"github.com/matthewrankin/go-sls-crudl/helpers/dao"
+	"github.com/matthewrankin/go-sls-crudl/helpers/resp"
 )
 
 // Parse slug into a space separated string
@@ -26,10 +26,7 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	if err != nil {
 		panic(fmt.Sprintf("Failed to find Item, %v", err))
 	}
-	return events.APIGatewayProxyResponse{
-		Body:       "Success\n",
-		StatusCode: http.StatusOK,
-	}, nil
+	return resp.Success()
 }
 
 func main() {

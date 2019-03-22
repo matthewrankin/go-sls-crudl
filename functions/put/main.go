@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 
 	"github.com/matthewrankin/go-sls-crudl/helpers/dao"
+	"github.com/matthewrankin/go-sls-crudl/helpers/resp"
 )
 
 // Handler handles the PUT requests.
@@ -18,18 +18,12 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	if err != nil {
 		fmt.Println("Got error calling put")
 		fmt.Println(err.Error())
-		return events.APIGatewayProxyResponse{
-			Body:       "Error",
-			StatusCode: http.StatusInternalServerError,
-		}, nil
+		return resp.InternalError("Error")
 	}
 
 	// Log and return result
 	fmt.Println("Updated item:  ", item)
-	return events.APIGatewayProxyResponse{
-		Body:       "Success\n",
-		StatusCode: http.StatusOK,
-	}, nil
+	return resp.Success()
 }
 
 func main() {

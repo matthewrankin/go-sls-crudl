@@ -3,13 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 
 	"github.com/matthewrankin/go-sls-crudl/helpers/dao"
+	"github.com/matthewrankin/go-sls-crudl/helpers/resp"
 )
 
 // Parse slug into a space separated string
@@ -31,20 +31,14 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	// Make sure the Item isn't empty
 	if item.Year <= 0 {
 		fmt.Println("Could not find movie")
-		return events.APIGatewayProxyResponse{
-			Body:       request.Body,
-			StatusCode: http.StatusInternalServerError,
-		}, nil
+		return resp.InternalError(request.Body)
 	}
 
 	// Log and return result
 	jsonItem, _ := json.Marshal(item)
 	stringItem := string(jsonItem) + "\n"
 	fmt.Println("Found item: ", stringItem)
-	return events.APIGatewayProxyResponse{
-		Body:       stringItem,
-		StatusCode: http.StatusOK,
-	}, nil
+	return resp.OK(stringItem)
 }
 
 func main() {
