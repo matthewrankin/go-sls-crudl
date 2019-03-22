@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -25,7 +26,10 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	if err != nil {
 		panic(fmt.Sprintf("Failed to find Item, %v", err))
 	}
-	return events.APIGatewayProxyResponse{Body: "Success\n", StatusCode: 200}, nil
+	return events.APIGatewayProxyResponse{
+		Body:       "Success\n",
+		StatusCode: http.StatusOK,
+	}, nil
 }
 
 func main() {

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -30,14 +31,20 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	// Make sure the Item isn't empty
 	if item.Year <= 0 {
 		fmt.Println("Could not find movie")
-		return events.APIGatewayProxyResponse{Body: request.Body, StatusCode: 500}, nil
+		return events.APIGatewayProxyResponse{
+			Body:       request.Body,
+			StatusCode: http.StatusInternalServerError,
+		}, nil
 	}
 
 	// Log and return result
 	jsonItem, _ := json.Marshal(item)
 	stringItem := string(jsonItem) + "\n"
 	fmt.Println("Found item: ", stringItem)
-	return events.APIGatewayProxyResponse{Body: stringItem, StatusCode: 200}, nil
+	return events.APIGatewayProxyResponse{
+		Body:       stringItem,
+		StatusCode: http.StatusOK,
+	}, nil
 }
 
 func main() {

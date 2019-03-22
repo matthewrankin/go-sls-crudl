@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -16,12 +17,18 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	if err != nil {
 		fmt.Println("Got error calling post")
 		fmt.Println(err.Error())
-		return events.APIGatewayProxyResponse{Body: "Error", StatusCode: 500}, nil
+		return events.APIGatewayProxyResponse{
+			Body:       "Error",
+			StatusCode: http.StatusInternalServerError,
+		}, nil
 	}
 
 	// Log and return result
 	fmt.Println("Wrote item:  ", item)
-	return events.APIGatewayProxyResponse{Body: "Success\n", StatusCode: 200}, nil
+	return events.APIGatewayProxyResponse{
+		Body:       "Success\n",
+		StatusCode: http.StatusOK,
+	}, nil
 }
 
 func main() {
