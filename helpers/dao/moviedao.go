@@ -20,16 +20,17 @@ type ItemInfo struct {
 	Rating float64 `json:"rating"`
 }
 
-// Item has fields for the DynamoDB keys (Year and Title) and an ItemInfo for more data
+// Item has fields for the DynamoDB keys (Year and Title) and an ItemInfo for
+// more data
 type Item struct {
 	Year  int      `json:"year"`
 	Title string   `json:"title"`
 	Info  ItemInfo `json:"info"`
 }
 
-// GetByYearTitle wraps up the DynamoDB calls to fetch a specific Item
-// Based on https://github.com/awsdocs/aws-doc-sdk-examples/blob/master/go/example_code/dynamodb/read_item.go
+// GetByYearTitle wraps up the DynamoDB calls to fetch a specific Item.
 func GetByYearTitle(year, title string) (Item, error) {
+
 	// Build the Dynamo client object
 	sess := session.Must(session.NewSession())
 	svc := dynamodb.New(sess)
@@ -63,9 +64,10 @@ func GetByYearTitle(year, title string) (Item, error) {
 	return item, nil
 }
 
-// ListByYear wraps up the DynamoDB calls to list all items of a particular year
-// Based on https://github.com/awsdocs/aws-doc-sdk-examples/blob/master/go/example_code/dynamodb/scan_items.go
+// ListByYear wraps up the DynamoDB calls to list all items of a particular
+// year
 func ListByYear(year string) ([]Item, error) {
+
 	// Build the Dynamo client object
 	sess := session.Must(session.NewSession())
 	svc := dynamodb.New(sess)
@@ -77,9 +79,7 @@ func ListByYear(year string) ([]Item, error) {
 
 	// Get back the title, year, and rating
 	proj := expression.NamesList(expression.Name("title"), expression.Name("year"))
-
 	expr, err := expression.NewBuilder().WithFilter(filt).WithProjection(proj).Build()
-
 	if err != nil {
 		fmt.Println("Got error building expression:")
 		fmt.Println(err.Error())
@@ -108,15 +108,12 @@ func ListByYear(year string) ([]Item, error) {
 	numItems := 0
 	for _, i := range result.Items {
 		item := Item{}
-
 		err = dynamodbattribute.UnmarshalMap(i, &item)
-
 		if err != nil {
 			fmt.Println("Got error unmarshalling:")
 			fmt.Println(err.Error())
 			return items, err
 		}
-
 		fmt.Println("Title: ", item.Title)
 		items = append(items, item)
 		numItems++
@@ -132,7 +129,6 @@ func ListByYear(year string) ([]Item, error) {
 }
 
 // Post extracts the Item JSON and writes it to DynamoDB
-// Based on https://github.com/awsdocs/aws-doc-sdk-examples/blob/master/go/example_code/dynamodb/create_item.go
 func Post(body string) (Item, error) {
 	// Create the dynamo client object
 	sess := session.Must(session.NewSession())
@@ -142,9 +138,12 @@ func Post(body string) (Item, error) {
 	var thisItem Item
 	json.Unmarshal([]byte(body), &thisItem)
 
-	// Take out non-alphanumberic except space characters from the title for easier slug building on reads
-	reg, err := regexp.Compile("[^a-zA-Z0-9\\s]+")
-	thisItem.Title = reg.ReplaceAllString(thisItem.Title, "")
+	newTitle, err := keepAlphaNums(thisItem.Title)
+	if err != nil {
+		fmt.Println("Error compiling regexp")
+		return thisItem, err
+	}
+	thisItem.Title = newTitle
 	fmt.Println("Item to add:", thisItem)
 
 	// Marshall the Item into a Map DynamoDB can deal with
@@ -166,7 +165,6 @@ func Post(body string) (Item, error) {
 }
 
 // Delete wraps up the DynamoDB calls to delete a specific Item
-// Based on https://github.com/awsdocs/aws-doc-sdk-examples/blob/master/go/example_code/dynamodb/delete_item.go
 func Delete(year, title string) error {
 	// Build the Dynamo client object
 	sess := session.Must(session.NewSession())
@@ -194,7 +192,6 @@ func Delete(year, title string) error {
 }
 
 // Put extracts the Item JSON and updates it in DynamoDB
-// Based on https://github.com/awsdocs/aws-doc-sdk-examples/blob/master/go/example_code/dynamodb/update_item.go
 func Put(body string) (Item, error) {
 	// Create the dynamo client object
 	sess := session.Must(session.NewSession())
@@ -204,9 +201,12 @@ func Put(body string) (Item, error) {
 	var thisItem Item
 	json.Unmarshal([]byte(body), &thisItem)
 
-	// Take out non-alphanumberic except space characters from the title for easier slug building on reads
-	reg, err := regexp.Compile("[^a-zA-Z0-9\\s]+")
-	thisItem.Title = reg.ReplaceAllString(thisItem.Title, "")
+	newTitle, err := keepAlphaNums(thisItem.Title)
+	if err != nil {
+		fmt.Println("Error compiling regexp")
+		return thisItem, err
+	}
+	thisItem.Title = newTitle
 	fmt.Println("Item to update:", thisItem)
 
 	// Update Item in table and return
@@ -238,4 +238,14 @@ func Put(body string) (Item, error) {
 	}
 	return thisItem, err
 
+}
+
+// keepAlphaNums removes the non-alphanumeric characters to make it easier to
+// create a slug.
+func keepAlphaNums(orig string) (string, error) {
+	reg, err := regexp.Compile("[^a-zA-Z0-9\\s]+")
+	if err != nil {
+		return "", err
+	}
+	return reg.ReplaceAllString(orig, ""), nil
 }
