@@ -33,8 +33,12 @@ func InternalError(body string) (events.APIGatewayProxyResponse, error) {
 // Response returns an API GatewayProxyResponse with the given body and the
 // given HTTP status code.
 func Response(body string, code int) (events.APIGatewayProxyResponse, error) {
+	hdrs := map[string]string{
+		"Content-Type": "application/vnd.go-sls-crudl-movies+json",
+	}
 	return events.APIGatewayProxyResponse{
-		Body:       body,
 		StatusCode: code,
+		Headers:    hdrs,
+		Body:       body,
 	}, nil
 }
