@@ -1,4 +1,4 @@
-.PHONY: build chekc clean deploy
+.PHONY: build check clean deploy
 GOBUILD=env GOOS=linux go build -ldflags="-s -w" -o
 
 help:
