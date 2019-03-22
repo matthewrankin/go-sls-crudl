@@ -39,7 +39,7 @@ func GetByYearTitle(year, title string) (Item, error) {
 	// Perform the query
 	fmt.Println("Trying to read from table: ", os.Getenv("TABLE_NAME"))
 	result, err := svc.GetItem(&dynamodb.GetItemInput{
-		TableName: aws.String(os.Getenv("TABLE_NAME")),
+		TableName: tableName(),
 		Key:       keyYearTitle(year, title),
 	})
 	if err != nil {
@@ -88,7 +88,7 @@ func ListByYear(year string) ([]Item, error) {
 		ExpressionAttributeValues: expr.Values(),
 		FilterExpression:          expr.Filter(),
 		ProjectionExpression:      expr.Projection(),
-		TableName:                 aws.String(os.Getenv("TABLE_NAME")),
+		TableName:                 tableName(),
 	}
 
 	// Make the DynamoDB Query API call
@@ -153,7 +153,7 @@ func Post(body string) (Item, error) {
 	// Create Item in table and return
 	input := &dynamodb.PutItemInput{
 		Item:      av,
-		TableName: aws.String(os.Getenv("TABLE_NAME")),
+		TableName: tableName(),
 	}
 	_, err = svc.PutItem(input)
 	return thisItem, err
@@ -168,7 +168,7 @@ func Delete(year, title string) error {
 
 	// Perform the delete
 	input := &dynamodb.DeleteItemInput{
-		TableName: aws.String(os.Getenv("TABLE_NAME")),
+		TableName: tableName(),
 		Key:       keyYearTitle(year, title),
 	}
 
@@ -208,7 +208,7 @@ func Put(body string) (Item, error) {
 				S: aws.String(thisItem.Info.Plot),
 			},
 		},
-		TableName:        aws.String(os.Getenv("TABLE_NAME")),
+		TableName:        tableName(),
 		Key:              keyYearTitle(strconv.Itoa(thisItem.Year), thisItem.Title),
 		ReturnValues:     aws.String("UPDATED_NEW"),
 		UpdateExpression: aws.String("set info.rating = :r, info.plot = :p"),
@@ -241,4 +241,8 @@ func keyYearTitle(year, title string) map[string]*dynamodb.AttributeValue {
 			S: aws.String(title),
 		},
 	}
+}
+
+func tableName() *string {
+	return aws.String(os.Getenv("TABLE_NAME"))
 }
