@@ -6,6 +6,15 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 )
 
+// Created returns an API GatewayProxyResponse with an empty body and a Created
+// HTTP status code.
+func Created() (events.APIGatewayProxyResponse, error) {
+	return events.APIGatewayProxyResponse{
+		Body:       "",
+		StatusCode: http.StatusCreated,
+	}, nil
+}
+
 // Success returns an API GatewayProxyResponse with the string "Success" in the
 // body and an OK HTTP status code.
 func Success() (events.APIGatewayProxyResponse, error) {
