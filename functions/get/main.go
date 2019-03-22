@@ -7,11 +7,9 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-)
 
-type Response struct {
-	Message string `json:"message"`
-}
+	"github.com/matthewrankin/go-sls-crudl/helpers/dao"
+)
 
 // Parse slug into a space separated string
 func parseSlug(orig string) (retval string) {
@@ -20,10 +18,11 @@ func parseSlug(orig string) (retval string) {
 	return retval
 }
 
+// Handler handles the GET requests.
 func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	// Make the call to the DAO with params found in the path
 	fmt.Println("Path vars: ", request.PathParameters["year"], " ", parseSlug(request.PathParameters["title"]))
-	item, err := GetByYearTitle(request.PathParameters["year"], parseSlug(request.PathParameters["title"]))
+	item, err := dao.GetByYearTitle(request.PathParameters["year"], parseSlug(request.PathParameters["title"]))
 	if err != nil {
 		panic(fmt.Sprintf("Failed to find Item, %v", err))
 	}

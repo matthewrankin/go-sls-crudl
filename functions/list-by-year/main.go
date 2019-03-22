@@ -6,16 +6,15 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+
+	"github.com/matthewrankin/go-sls-crudl/helpers/dao"
 )
 
-type Response struct {
-	Message string `json:"message"`
-}
-
+// Handler handles the GET by year requests.
 func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	// Make the call to the DAO with params found in the path
 	fmt.Println("Path vars: ", request.PathParameters["year"])
-	items, err := ListByYear(request.PathParameters["year"])
+	items, err := dao.ListByYear(request.PathParameters["year"])
 	if err != nil {
 		panic(fmt.Sprintf("Failed to find Item, %v", err))
 	}
