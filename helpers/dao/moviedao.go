@@ -40,14 +40,7 @@ func GetByYearTitle(year, title string) (Item, error) {
 	fmt.Println("Trying to read from table: ", os.Getenv("TABLE_NAME"))
 	result, err := svc.GetItem(&dynamodb.GetItemInput{
 		TableName: aws.String(os.Getenv("TABLE_NAME")),
-		Key: map[string]*dynamodb.AttributeValue{
-			"year": {
-				N: aws.String(year),
-			},
-			"title": {
-				S: aws.String(title),
-			},
-		},
+		Key:       keyYearTitle(year, title),
 	})
 	if err != nil {
 		fmt.Println(err.Error())
@@ -172,15 +165,8 @@ func Delete(year, title string) error {
 
 	// Perform the delete
 	input := &dynamodb.DeleteItemInput{
-		Key: map[string]*dynamodb.AttributeValue{
-			"year": {
-				N: aws.String(year),
-			},
-			"title": {
-				S: aws.String(title),
-			},
-		},
 		TableName: aws.String(os.Getenv("TABLE_NAME")),
+		Key:       keyYearTitle(year, title),
 	}
 
 	_, err := svc.DeleteItem(input)
@@ -219,15 +205,8 @@ func Put(body string) (Item, error) {
 				S: aws.String(thisItem.Info.Plot),
 			},
 		},
-		TableName: aws.String(os.Getenv("TABLE_NAME")),
-		Key: map[string]*dynamodb.AttributeValue{
-			"year": {
-				N: aws.String(strconv.Itoa(thisItem.Year)),
-			},
-			"title": {
-				S: aws.String(thisItem.Title),
-			},
-		},
+		TableName:        aws.String(os.Getenv("TABLE_NAME")),
+		Key:              keyYearTitle(strconv.Itoa(thisItem.Year), thisItem.Title),
 		ReturnValues:     aws.String("UPDATED_NEW"),
 		UpdateExpression: aws.String("set info.rating = :r, info.plot = :p"),
 	}
@@ -248,4 +227,15 @@ func keepAlphaNums(orig string) (string, error) {
 		return "", err
 	}
 	return reg.ReplaceAllString(orig, ""), nil
+}
+
+func keyYearTitle(year, title string) map[string]*dynamodb.AttributeValue {
+	return map[string]*dynamodb.AttributeValue{
+		"year": {
+			N: aws.String(year),
+		},
+		"title": {
+			S: aws.String(title),
+		},
+	}
 }
