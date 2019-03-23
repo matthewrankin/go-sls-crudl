@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -13,10 +14,10 @@ import (
 )
 
 // Handler handles the GET requests.
-func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	// Make the call to the DAO with params found in the path
-	year := request.PathParameters["year"]
-	title := parse.Unslugify(request.PathParameters["title"])
+	year := req.PathParameters["year"]
+	title := parse.Unslugify(req.PathParameters["title"])
 	fmt.Printf("Path vars: %s - %s\n", year, title)
 	item, err := dao.GetByYearTitle(year, title)
 	if err != nil {
@@ -27,7 +28,7 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	// Make sure the Item isn't empty
 	if item.Year <= 0 {
 		fmt.Println("Could not find movie")
-		return resp.InternalError(request.Body)
+		return resp.InternalError(req.Body)
 	}
 
 	// Log and return result

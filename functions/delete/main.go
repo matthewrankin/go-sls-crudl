@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -12,10 +13,10 @@ import (
 )
 
 // Handler handles the DELETE requests.
-func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	// Make the call to the DAO with params found in the path
-	year := request.PathParameters["year"]
-	title := parse.Unslugify(request.PathParameters["title"])
+	year := req.PathParameters["year"]
+	title := parse.Unslugify(req.PathParameters["title"])
 	fmt.Printf("Path vars: %s - %s\n", year, title)
 	err := dao.Delete(year, title)
 	if err != nil {

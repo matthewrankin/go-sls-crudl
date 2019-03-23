@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -11,13 +12,13 @@ import (
 )
 
 // Handler handles the PUT requests.
-func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	// FIXME(mdr): Currently, the call to the PUT endpoint, doesn't require the
 	// ID in the URL. I don't think that falls in line with general REST
 	// principles.
 	// Log body and pass to the DAO
-	fmt.Println("Received body: ", request.Body)
-	item, err := dao.Put(request.Body)
+	fmt.Println("Received body: ", req.Body)
+	item, err := dao.Put(req.Body)
 	if err != nil {
 		fmt.Println("Got error calling put")
 		fmt.Println(err.Error())

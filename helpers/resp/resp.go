@@ -8,8 +8,16 @@ import (
 
 // Created returns an API GatewayProxyResponse with an empty body and a Created
 // HTTP status code.
-func Created() (events.APIGatewayProxyResponse, error) {
-	return Response("", http.StatusCreated)
+func Created(location string) (events.APIGatewayProxyResponse, error) {
+	hdrs := map[string]string{
+		"Content-Type": "application/vnd.go-sls-crudl-movies+json",
+		"Location":     location,
+	}
+	return events.APIGatewayProxyResponse{
+		StatusCode: http.StatusCreated,
+		Headers:    hdrs,
+		Body:       "",
+	}, nil
 }
 
 // NoContent returns an API GatewayProxyResponse with an empty body and a No
