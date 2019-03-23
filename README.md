@@ -2,7 +2,9 @@
 
 This project riffs off of the [Dynamo DB Golang samples][1] and the
 [Serverless Framework Go example][2] to create an example of how to
-build a simple API Gateway -> Lambda -> DynamoDB set of methods.
+build a simple API Gateway -> Lambda -> DynamoDB set of methods. This is
+a fork of the repository referenced in Pete Johnson's article ["A
+DynamoDB-Backed CRUDL example using Golang"][article].
 
 ## Code Organization
 
@@ -154,3 +156,4 @@ Which should result in the DynamoDB table looking like this:
 [3]: https://github.com/nerdguru/go-sls-crudl
 [sls-install]: https://serverless.com/blog/anatomy-of-a-serverless-app/#setup
 [go-install]: https://golang.org/doc/install
+[article]: https://serverless.com/blog/dynamodb-backend-crudl-example-using-golang/
